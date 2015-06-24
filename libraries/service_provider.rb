@@ -105,40 +105,44 @@ class Chef::Provider::WindowsHelperService < Chef::Provider::Service::Windows
 
     #TODO: should check all parameters configuring (look at full_config_hash)
     
-    Chef::Log.info("Config same?. current.start_type: #{current_config.start_type}, new.startup_type: #{ALLOWED_STARTUP_TYPES[@new_resource.startup_type]}")
-    Chef::Log.info("Config same?. current.bin_path: #{current_config.binary_path_name}, new.bin_path: #{@new_resource.bin_path}")
-    Chef::Log.info("Config same?. current.run_as_user: #{current_config.service_start_name}, new.run_as_user: #{@new_resource.run_as_user}")
-    Chef::Log.info("Config same?. current.display_name: #{current_config.display_name}, new.display_name: #{@new_resource.display_name}")
-    current_config.start_type == ALLOWED_STARTUP_TYPES[@new_resource.startup_type] &&
-    current_config.binary_path_name == @new_resource.bin_path &&
-    current_config.service_start_name == @new_resource.run_as_user &&
-    current_config.display_name == @new_resource.display_name
+    Chef::Log.debug("Config same?. @new_resource.startup_type.nil?: #{@new_resource.startup_type.nil?}  current.start_type: #{current_config.start_type}, new.startup_type: #{Win32::Service.get_start_type(ALLOWED_STARTUP_TYPES[@new_resource.startup_type])}")
+    Chef::Log.debug("Config same?. @new_resource.bin_path.nil?: #{@new_resource.bin_path.nil?} current.bin_path: #{current_config.binary_path_name}, new.bin_path: #{@new_resource.bin_path}")
+    Chef::Log.debug("Config same?. @new_resource.run_as_user.nil?: #{@new_resource.run_as_user.nil?} current.run_as_user: #{current_config.service_start_name}, new.run_as_user: #{@new_resource.run_as_user}")
+    Chef::Log.debug("Config same?. @new_resource.display_name.nil?: #{@new_resource.display_name.nil?} current.display_name: #{current_config.display_name}, new.display_name: #{@new_resource.display_name}")
+    (@new_resource.startup_type.nil? ||
+        current_config.start_type == Win32::Service.get_start_type(ALLOWED_STARTUP_TYPES[@new_resource.startup_type])) &&
+        (@new_resource.bin_path.nil? ||
+            current_config.binary_path_name == @new_resource.bin_path) &&
+        (@new_resource.run_as_user.nil? ||
+            current_config.service_start_name == @new_resource.run_as_user) &&
+        (@new_resource.display_name.nil? ||
+            current_config.display_name == @new_resource.display_name)
   end
 
   def fill_config_hash
     {
-            :service_name         => @new_resource.service_name,
-            :display_name         => @new_resource.display_name,
-            :description          => @new_resource.description,
-            :binary_path_name     => @new_resource.bin_path,
-            :service_start_name   => @new_resource.run_as_user,
-            :password             => @new_resource.run_as_password,
-            :failure_reset_period => @new_resource.reset_fail_counter_days*60*60*24,
-            :failure_delay        => @new_resource.restart_after_min*60*1000,
-            :failure_actions      => get_failure_actions,
-            :start_type           => ALLOWED_STARTUP_TYPES[@new_resource.startup_type],
-            :host                 => @new_resource.host,
+        :service_name         => @new_resource.service_name,
+        :display_name         => @new_resource.display_name,
+        :description          => @new_resource.description,
+        :binary_path_name     => @new_resource.bin_path,
+        :service_start_name   => @new_resource.run_as_user,
+        :password             => @new_resource.run_as_password,
+        :failure_reset_period => @new_resource.reset_fail_counter_days*60*60*24,
+        :failure_delay        => @new_resource.restart_after_min*60*1000,
+        :failure_actions      => get_failure_actions,
+        :start_type           => ALLOWED_STARTUP_TYPES[@new_resource.startup_type],
+        :host                 => @new_resource.host,
 
-            :service_type         => Win32::Service::WIN32_OWN_PROCESS,
-            :error_control        => Win32::Service::ERROR_NORMAL,
-        }
+        :service_type         => Win32::Service::WIN32_OWN_PROCESS,
+        :error_control        => Win32::Service::ERROR_NORMAL,
+    }
   end
 
   def get_failure_actions
-   actions = [
-      ALLOWED_FAILURE_ACTIONS[@new_resource.recovery_first_failure],
-      ALLOWED_FAILURE_ACTIONS[@new_resource.recovery_second_failure],
-      ALLOWED_FAILURE_ACTIONS[@new_resource.recovery_subsequent_failures]
+    actions = [
+        ALLOWED_FAILURE_ACTIONS[@new_resource.recovery_first_failure],
+        ALLOWED_FAILURE_ACTIONS[@new_resource.recovery_second_failure],
+        ALLOWED_FAILURE_ACTIONS[@new_resource.recovery_subsequent_failures]
     ]
     Chef::Log.debug("failure actions: #{actions}")
     actions

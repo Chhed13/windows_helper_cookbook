@@ -1,6 +1,6 @@
 {
   "name": "windows_helper",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Extends basic Chef functionality when working on Windows",
   "long_description": "Extends basic Chef functionality when working on Windows. Watch README.md for details",
   "maintainer": "Wild Apricot",
