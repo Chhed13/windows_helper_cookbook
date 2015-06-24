@@ -106,7 +106,7 @@ class Chef::Provider::WindowsHelperService < Chef::Provider::Service::Windows
     #TODO: should check all parameters configuring (look at full_config_hash)
     
     Chef::Log.info("Config same?. current.start_type: #{current_config.start_type}, new.startup_type: #{ALLOWED_STARTUP_TYPES[@new_resource.startup_type]}")
-    Chef::Log.info("Config same?. current.bin_path: #{current_config.binary_path_name}, new.bin_path: #{@new_resource.bin_path]}")
+    Chef::Log.info("Config same?. current.bin_path: #{current_config.binary_path_name}, new.bin_path: #{@new_resource.bin_path}")
     Chef::Log.info("Config same?. current.run_as_user: #{current_config.service_start_name}, new.run_as_user: #{@new_resource.run_as_user}")
     Chef::Log.info("Config same?. current.display_name: #{current_config.display_name}, new.display_name: #{@new_resource.display_name}")
     current_config.start_type == ALLOWED_STARTUP_TYPES[@new_resource.startup_type] &&
